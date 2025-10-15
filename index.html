@@ -1,0 +1,2870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@lathandh</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-primary: #121212; --bg-secondary: #1e1e1e; --bg-tertiary: #2a2a2a;
+            --text-primary: #e0e0e0; --text-secondary: #b0b0b0; --accent-color: #4a90e2;
+            --win-color: #34c759; --loss-color: #ff3b30; --border-radius: 12px;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: 400; background: var(--bg-primary);
+            color: var(--text-primary); margin: 0; padding: 0; display: flex; justify-content: center;
+        }
+        
+        .site-wrapper {
+            display: flex;
+            width: 100%;
+            max-width: 1920px;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        
+        .main-content-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+        h2 { font-weight: 600; text-align: center; color: #fff; font-size: 1.25rem; margin-top: 0; margin-bottom: 15px; }
+        .container { width: 100%; max-width: 100%; padding-top: 20px; }
+        .trade-offers { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 20px; }
+        .offer { 
+            background: var(--bg-secondary); 
+            padding: 25px; 
+            border-radius: 16px; 
+            border: 1px solid #444; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        .offer:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+        .slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
+        .slot {
+            background: var(--bg-tertiary); 
+            border-radius: 12px; 
+            aspect-ratio: 1 / 1; 
+            display: flex;
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer;
+            position: relative; 
+            overflow: hidden; 
+            user-select: none; 
+            transition: all 0.3s ease;
+            border: 2px dashed #444; 
+            padding: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+        .slot.empty:hover { 
+            transform: scale(1.05); 
+            background-color: #353535; 
+            border-color: var(--accent-color);
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.2);
+        }
+	.pet-card.secret-highlight {
+    	border: 2px solid rgba(220, 38, 38, 0.6);
+   	 box-shadow: 0 0 12px rgba(220, 38, 38, 0.4);
+    	position: relative;
+	}
+
+        .slot.filled img { 
+            width: 80%; 
+            height: 60%; 
+            object-fit: contain; 
+            border-radius: 12px; 
+            margin-bottom: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .slot.filled { 
+            border: 1px solid #555; 
+            cursor: default; 
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+        .remove-button {
+            position: absolute; 
+            top: 6px; 
+            right: 6px; 
+            background: rgba(255, 59, 48, 0.9);
+            border: none; 
+            color: white; 
+            border-radius: 50%; 
+            width: 22px; 
+            height: 22px;
+            cursor: pointer; 
+            font-size: 12px; 
+            opacity: 0; 
+            transition: all 0.3s ease;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transform: scale(0.8);
+            box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3);
+        }
+        .slot:hover .remove-button { 
+            opacity: 1; 
+            transform: scale(1);
+            box-shadow: 0 4px 12px rgba(255, 59, 48, 0.4);
+        }
+        .slot-pet-name {
+            font-size: 11px; font-weight: 500; width: 100%; text-align: center; overflow: hidden;
+            text-overflow: ellipsis; white-space: nowrap; padding: 0 5px; position: absolute; bottom: 25px; 
+        }
+        .quantity-controls {
+            display: flex; 
+            justify-content: space-around; 
+            align-items: center;
+            width: 100%; 
+            position: absolute; 
+            bottom: 6px;
+        }
+        .qty-btn { 
+            background: var(--bg-primary); 
+            color: white; 
+            border: 1px solid #444; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            width: 24px; 
+            height: 24px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .qty-btn:hover { 
+            background: var(--accent-color); 
+            border-color: var(--accent-color);
+            transform: scale(1.1);
+        }
+        .quantity { 
+            font-size: 14px; 
+            font-weight: 600; 
+            color: var(--text-primary);
+        }
+        .total { 
+            margin-top: 20px; 
+            text-align: right; 
+            font-size: 1.2rem; 
+            font-weight: 600;
+            color: var(--text-primary);
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            border: 1px solid #444;
+        }
+        .trade-result-container {
+            margin-top: 25px; 
+            padding: 20px; 
+            border-radius: 16px;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            visibility: hidden; 
+            opacity: 0; 
+            transition: all 0.4s ease;
+            background: var(--bg-secondary);
+            border: 1px solid #444;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+        .trade-result-container.active { 
+            visibility: visible; 
+            opacity: 1; 
+            transform: translateY(0);
+        }
+        #trade-result-text { 
+            font-weight: 700; 
+            font-size: 1.3rem; 
+            padding: 12px 20px; 
+            border-radius: 12px; 
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+        .demand-display { 
+            font-weight: 600; 
+            font-size: 1rem; 
+            color: var(--text-primary); 
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            border: 1px solid #444;
+        }
+        .demand-label { 
+            padding: 6px 12px; 
+            border-radius: 8px; 
+            color: #fff; 
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .demand-low { background-color: #ff3b30; }
+        .demand-medium { background-color: #ffcc00; color: #1c1c1e; }
+        .demand-high { background-color: #34c759; }
+        .demand-very-high { background-color: #ff69b4; }
+        .demand-insane { background-color: #bf5af2; }
+        
+        .modal {
+            display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px); align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s ease; z-index: 1000;
+        }
+        .modal.show { display: flex; opacity: 1; }
+        .modal-content {
+            background: var(--bg-secondary); 
+            padding: 30px; 
+            border-radius: 20px; 
+            width: 90%;
+            max-width: 1200px; 
+            max-height: 90vh; 
+            display: flex; 
+            flex-direction: column; 
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            backdrop-filter: blur(20px);
+            border: 1px solid #444;
+        }
+        #pet-info-modal .modal-content { max-width: 800px; }
+        .modal-header {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            margin-bottom: 25px; 
+            flex-wrap: wrap; 
+            gap: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #444;
+        }
+        .close-button { 
+            font-size: 2.5rem; 
+            font-weight: 300; 
+            cursor: pointer; 
+            color: var(--text-secondary); 
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .close-button:hover { 
+            color: var(--text-primary); 
+            background: var(--bg-tertiary);
+            transform: scale(1.1);
+        }
+        .search-sort-controls { 
+            display: flex; 
+            gap: 20px; 
+            flex-grow: 1; 
+        }
+        #search-bar, #sort-select {
+            background-color: var(--bg-tertiary); 
+            color: var(--text-primary); 
+            border: 1px solid #444;
+            border-radius: 12px; 
+            padding: 12px 16px; 
+            font-size: 1rem; 
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+        #search-bar:focus, #sort-select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+        #search-bar { flex-grow: 1; }
+        .filter-controls { 
+            display: flex; 
+            gap: 12px; 
+            margin-bottom: 25px; 
+            flex-wrap: wrap; 
+        }
+        .filter-btn {
+            background: var(--bg-tertiary); 
+            border: 1px solid #444; 
+            color: var(--text-secondary);
+            padding: 10px 20px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            font-weight: 600;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+        .filter-btn.active, .filter-btn:hover { 
+            background: var(--accent-color); 
+            color: #fff; 
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.3);
+        }
+        .pet-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+            gap: 20px; 
+            overflow-y: auto; 
+            padding-right: 15px; 
+            flex-grow: 1; 
+            min-height: 200px; 
+        }
+        .pet-item { 
+            position: relative; 
+            background: var(--bg-tertiary); 
+            padding: 15px; 
+            border-radius: 16px; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between;
+            border: 1px solid #444;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+        .pet-item:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+            border-color: var(--accent-color);
+        }
+        .pet-item img { 
+            width: 100px; 
+            height: 100px; 
+            object-fit: contain; 
+            margin: 0 auto 12px auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+        .pet-info-name { 
+            font-weight: 600; 
+            font-size: 1rem; 
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        .pet-info { 
+            font-size: 0.9rem; 
+            color: var(--text-secondary); 
+            margin-top: 4px;
+            font-weight: 500;
+        }
+        .pagination-controls { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 25px; 
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #444;
+        }
+        .pagination-btn { 
+            background: var(--bg-tertiary); 
+            border: 1px solid #444; 
+            color: var(--text-primary); 
+            padding: 12px 20px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+        .pagination-btn:hover:not(:disabled) { 
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.3);
+        }
+        .pagination-btn:disabled { 
+            opacity: 0.5; 
+            cursor: not-allowed;
+            transform: none;
+        }
+        #page-info { 
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+        
+        .more-info-btn {
+            position: absolute; 
+            top: 8px; 
+            right: 8px; 
+            width: 28px; 
+            height: 28px; 
+            border-radius: 8px;
+            background: rgba(0,0,0,0.4); 
+            color: var(--text-secondary); 
+            border: none; 
+            cursor: pointer;
+            font-weight: bold; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            line-height: 0;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .more-info-btn:hover { 
+            background: var(--accent-color); 
+            color: #fff;
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+        }
+        
+        #pet-info-modal-body { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 25px; 
+        }
+        .pet-header { 
+            display: flex; 
+            gap: 25px; 
+            align-items: center;
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-radius: 16px;
+            border: 1px solid #444;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+        .pet-header img { 
+            width: 100px; 
+            height: 100px; 
+            object-fit: contain; 
+            border-radius: 16px; 
+            background: var(--bg-primary); 
+            padding: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+        .pet-info-summary { 
+            flex: 1; 
+        }
+        .pet-info-summary p { 
+            margin: 8px 0; 
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .pet-info-summary .stat-category { 
+            font-weight: 700; 
+            color: var(--text-primary); 
+            margin-top: 20px; 
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+        .pet-info-summary .current-value { 
+            font-size: 1.4rem; 
+            font-weight: 700; 
+            color: var(--accent-color); 
+            margin-bottom: 12px;
+            padding: 12px 16px;
+            background: rgba(74, 144, 226, 0.15);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-color);
+            box-shadow: 0 4px 16px rgba(74, 144, 226, 0.2);
+        }
+        .pet-info-summary .demand-info { 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        .pet-info-summary .rarity-info { 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        .chart-container { 
+            position: relative; 
+            height: 400px; 
+            width: 100%;
+            background: var(--bg-tertiary);
+            border-radius: 16px;
+            border: 1px solid #444;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+        .chart-loading { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 200px; 
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .chart-error { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 200px; 
+            color: var(--loss-color);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        /* Notification System Styles */
+        .notification-button {
+            position: fixed; top: 20px; right: 20px; z-index: 1001;
+            background: var(--bg-secondary); border: 1px solid #444; border-radius: 50%;
+            width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .notification-button:hover { background: var(--bg-tertiary); transform: scale(1.05); }
+        .notification-icon { font-size: 1.5rem; }
+        .notification-count {
+            position: absolute; top: -5px; right: -5px; background: var(--loss-color);
+            color: white; border-radius: 50%; width: 20px; height: 20px;
+            display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold;
+            opacity: 0; transform: scale(0); transition: all 0.3s ease;
+        }
+        .notification-count.show { opacity: 1; transform: scale(1); }
+        
+        .notification-menu {
+            position: fixed; top: 80px; right: 20px; z-index: 1000;
+            background: var(--bg-secondary); border: 1px solid #444; border-radius: 12px;
+            width: 350px; max-height: 500px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            opacity: 0; transform: translateY(-20px) scale(0.95); visibility: hidden;
+            transition: all 0.3s ease; backdrop-filter: blur(10px);
+        }
+        .notification-menu.show { opacity: 1; transform: translateY(0) scale(1); visibility: visible; }
+        
+        .notification-menu-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 20px; border-bottom: 1px solid #444;
+        }
+        .notification-menu-header h3 { margin: 0; color: var(--text-primary); font-size: 1.1rem; }
+        .mark-all-read-btn {
+            background: var(--accent-color); color: white; border: none; border-radius: 6px;
+            padding: 6px 12px; font-size: 0.8rem; cursor: pointer; transition: background-color 0.2s;
+        }
+        .mark-all-read-btn:hover { background: #3a7bc8; }
+        
+        .notification-list { max-height: 400px; overflow-y: auto; }
+        .notification-item {
+            padding: 15px 20px; border-bottom: 1px solid #333; cursor: pointer;
+            transition: background-color 0.2s; display: flex; gap: 12px; align-items: center;
+        }
+        .notification-item:hover { background: var(--bg-tertiary); }
+        .notification-item.unread { background: rgba(74, 144, 226, 0.1); border-left: 3px solid var(--accent-color); }
+        .notification-item.unread:hover { background: rgba(74, 144, 226, 0.15); }
+        
+        .notification-item-image { width: 40px; height: 40px; object-fit: contain; border-radius: 8px; }
+        .notification-item-content { flex: 1; }
+        .notification-item-pet { font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .notification-item-change { font-size: 0.9rem; color: var(--text-secondary); }
+        .notification-item-time { font-size: 0.8rem; color: #888; margin-top: 4px; }
+        .notification-item-details { 
+            font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; 
+            display: flex; flex-direction: column; gap: 2px;
+        }
+        .notification-value-change { 
+            font-weight: 600; color: var(--accent-color); 
+        }
+        .notification-demand-change { 
+            font-weight: 500; color: var(--win-color); 
+        }
+        .notification-status-change { 
+            font-weight: 500; color: #ffb400; 
+        }
+        
+        .no-notifications { padding: 30px 20px; text-align: center; color: var(--text-secondary); }
+        
+        /* iPhone-style notification popup */
+        .notification-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 1002; opacity: 0; visibility: hidden; transition: all 0.4s ease;
+        }
+        .notification-popup.show {
+            opacity: 1; visibility: visible; animation: slideUpIn 0.4s ease;
+        }
+        .notification-popup-content {
+            background: var(--bg-secondary); backdrop-filter: blur(20px);
+            border-radius: 16px; padding: 16px; min-width: 300px; max-width: 400px;
+            border: 1px solid #444; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .notification-popup-header {
+            display: flex; gap: 12px; align-items: center; margin-bottom: 8px;
+        }
+        .notification-pet-image { width: 50px; height: 50px; object-fit: contain; border-radius: 10px; }
+        .notification-popup-info { flex: 1; }
+        .notification-pet-name { font-weight: 600; color: var(--text-primary); font-size: 1rem; }
+        .notification-popup-time { font-size: 0.8rem; color: var(--text-secondary); }
+        .notification-popup-body { margin-top: 8px; }
+        .notification-value-change { color: var(--text-primary); font-size: 0.9rem; }
+        
+        @keyframes slideUpIn {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* Expanded notification view */
+        .notification-expanded {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 1003; opacity: 0; visibility: hidden; transition: all 0.4s ease;
+            background: var(--bg-secondary); border: 1px solid #444; border-radius: 16px;
+            width: 90%; max-width: 800px; max-height: 80vh; overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+        }
+        .notification-expanded.show {
+            opacity: 1; visibility: visible; animation: expandIn 0.4s ease;
+        }
+        .notification-expanded-header {
+            display: flex; gap: 15px; align-items: center; padding: 20px;
+            border-bottom: 1px solid #444; background: var(--bg-tertiary);
+            border-radius: 16px 16px 0 0;
+        }
+        .notification-expanded-pet-image { 
+            width: 80px; height: 80px; object-fit: contain; border-radius: 12px; 
+            background: var(--bg-primary); padding: 8px;
+        }
+        .notification-expanded-info { flex: 1; }
+        .notification-expanded-pet-name { 
+            font-weight: 700; color: var(--text-primary); font-size: 1.4rem; margin-bottom: 8px; 
+        }
+        .notification-expanded-last-edited { 
+            font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 12px; 
+        }
+        .notification-expanded-close {
+            background: none; border: none; color: var(--text-secondary); font-size: 2rem;
+            cursor: pointer; padding: 5px; border-radius: 50%; transition: all 0.2s;
+            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+        }
+        .notification-expanded-close:hover {
+            background: var(--bg-primary); color: var(--text-primary);
+        }
+        .notification-expanded-body {
+            padding: 20px; display: flex; flex-direction: column; gap: 20px;
+        }
+        .notification-expanded-stats {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;
+        }
+        .stat-card {
+            background: var(--bg-tertiary); padding: 15px; border-radius: 12px; border: 1px solid #444;
+        }
+        .stat-card-title { 
+            font-weight: 600; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 8px; 
+        }
+        .stat-card-value { 
+            font-weight: 700; color: var(--text-primary); font-size: 1.2rem; 
+        }
+        .stat-card-change {
+            font-size: 0.8rem; margin-top: 4px; font-weight: 500;
+        }
+        .stat-card-change.positive { color: var(--win-color); }
+        .stat-card-change.negative { color: var(--loss-color); }
+        .stat-card-change.neutral { color: var(--text-secondary); }
+        
+        /* Color coding for notification value changes */
+        .notification-value-change.positive { color: var(--win-color); }
+        .notification-value-change.negative { color: var(--loss-color); }
+        .notification-value-change.neutral { color: var(--text-secondary); }
+        .notification-expanded-chart {
+            background: var(--bg-tertiary); padding: 20px; border-radius: 12px; border: 1px solid #444;
+            height: 300px; position: relative;
+        }
+        .notification-expanded-chart h3 {
+            margin: 0 0 15px 0; color: var(--text-primary); font-size: 1.1rem;
+        }
+
+        @keyframes expandIn {
+            from { 
+                transform: translate(-50%, -50%) scale(0.8); 
+                opacity: 0; 
+            }
+            to { 
+                transform: translate(-50%, -50%) scale(1); 
+                opacity: 1; 
+            }
+        }
+
+
+        #status-warnings { 
+            margin-top: 25px; 
+            text-align: center; 
+        }
+        .warning-item {
+            background-color: rgba(255, 180, 0, 0.15); 
+            border: 1px solid #ffb400; 
+            color: #ffb400;
+            padding: 15px 20px; 
+            border-radius: 12px; 
+            margin-bottom: 15px; 
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 4px 16px rgba(255, 180, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Discord Button Styles */
+        .discord-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #5865F2;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            text-decoration: none;
+        }
+        .discord-button:hover {
+            background: #4752C4;
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+        }
+        .discord-button img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        /* Page Navigation Styles */
+        .page-header {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .page-navigation {
+            display: flex;
+            gap: 10px;
+            background: var(--bg-secondary);
+            padding: 8px;
+            border-radius: 16px;
+            border: 1px solid #444;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+        
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 1rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .nav-btn.active {
+            background: var(--accent-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+        
+        .nav-btn:hover:not(.active) {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
+        /* Eggs Page Styles */
+        .page-content {
+            display: none;
+        }
+        
+        .page-content.active {
+            display: block;
+        }
+        
+        .eggs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .eggs-search {
+            display: flex;
+            gap: 15px;
+            flex-grow: 1;
+            max-width: 600px;
+        }
+        
+        #eggs-search-bar {
+            flex-grow: 1;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 1rem;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+        
+        #eggs-search-bar:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+        
+        .eggs-filter {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        #eggs-filter-select {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 1rem;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+        
+        #eggs-filter-select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+        
+        .eggs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .egg-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border: 1px solid #444;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .egg-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border-color: var(--accent-color);
+        }
+        
+        .egg-image {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            margin: 0 auto 15px auto;
+            border-radius: 12px;
+            background: var(--bg-primary);
+            padding: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+        
+        .egg-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .egg-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .egg-status.limited {
+            background: #34c759;
+            color: white;
+        }
+        
+        .egg-status.permanent {
+            background: #007AFF;
+            color: white;
+        }
+        
+        .egg-price {
+            margin-top: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .currency-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        .currency-icon.coins {
+            background-image: url('https://images.bgsi.io/coins.webp');
+        }
+        
+        .currency-icon.pearls {
+            background-image: url('https://images.bgsi.io/pearls.webp');
+        }
+        
+        .currency-icon.leaves {
+            background-image: url('https://content.bgsi.io/leaves.webp');
+        }
+
+        .currency-icon.tickets {
+            background-image: url('https://images.bgsi.io/ticket.webp');
+        }
+
+        .currency-icon.robux {
+            background-image: url('https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/e/d/f/edfae9388da4cd8496b885a8a2df613372500d9c.png');
+        }
+
+        /* Egg Detail Modal - Enhanced Popup Style */
+        .egg-detail-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .egg-detail-modal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .egg-detail-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .egg-detail-modal.show::before {
+            opacity: 1;
+        }
+        
+        .egg-detail-modal .modal-content {
+            position: relative;
+            max-width: 900px;
+            width: 90vw;
+            max-height: 85vh;
+            overflow-y: auto;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.6);
+            backdrop-filter: blur(20px);
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .egg-detail-modal.show .modal-content {
+            transform: scale(1) translateY(0);
+        }
+        
+        .egg-popup-header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 30px;
+            padding: 24px;
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(74, 144, 226, 0.05) 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(74, 144, 226, 0.2);
+        }
+        
+        .egg-popup-image {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            border-radius: 16px;
+            background: var(--bg-primary);
+            padding: 12px;
+            flex-shrink: 0;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            border: 2px solid rgba(74, 144, 226, 0.3);
+        }
+        
+        .egg-popup-info {
+            flex: 1;
+        }
+        
+        .egg-popup-name {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+        
+        .egg-popup-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .egg-meta-item {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            backdrop-filter: blur(10px);
+        }
+        
+        .egg-popup-price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(74, 144, 226, 0.15);
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(74, 144, 226, 0.3);
+        }
+        
+        .egg-popup-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .egg-popup-close:hover {
+            background: rgba(255, 59, 48, 0.2);
+            border-color: rgba(255, 59, 48, 0.4);
+            color: var(--loss-color);
+            transform: scale(1.1);
+        }
+        
+        .pets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        
+        .pet-card {
+            background: linear-gradient(135deg, var(--bg-tertiary) 0%, rgba(74, 144, 226, 0.05) 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pet-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(74, 144, 226, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .pet-card.secret-highlight::before {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.15) 0%, rgba(220, 38, 38, 0.08) 100%);
+        }
+        
+        .pet-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-color: rgba(74, 144, 226, 0.4);
+        }
+        
+        .pet-card:hover::before {
+            opacity: 1;
+        }
+        
+        .pet-card-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .pet-image {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            border-radius: 12px;
+            background: var(--bg-primary);
+            padding: 10px;
+            margin: 0 auto 16px auto;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            border: 2px solid rgba(74, 144, 226, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .pet-card:hover .pet-image {
+            border-color: rgba(74, 144, 226, 0.5);
+            box-shadow: 0 12px 28px rgba(74, 144, 226, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .pet-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+        }
+        
+        .pet-chance {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .pet-rarity {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        
+        .rarity-common {
+            background: #8E8E93;
+            color: white;
+        }
+        
+        .rarity-unique {
+            background: #34C759;
+            color: white;
+        }
+        
+        .rarity-rare {
+            background: #007AFF;
+            color: white;
+        }
+        
+        .rarity-epic {
+            background: #AF52DE;
+            color: white;
+        }
+        
+        .rarity-legendary {
+            background: #FF9500;
+            color: white;
+        }
+        
+        .rarity-secret {
+            background: #FF3B30;
+            color: white;
+        }
+        
+        .rarity-infinity {
+            background: #FF3B30;
+            color: white;
+        }
+
+
+        @media (max-width: 768px) {
+            .site-wrapper {
+                padding: 10px;
+            }
+            .trade-offers { grid-template-columns: 1fr; }
+            .modal-header { flex-direction: column; align-items: stretch;}
+            .trade-result-container { flex-direction: column; gap: 10px; }
+            .discord-button {
+                width: 50px;
+                height: 50px;
+                bottom: 15px;
+                left: 15px;
+            }
+            .discord-button img {
+                width: 100%;
+                height: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="site-wrapper">
+
+        <!-- Main Content -->
+        <div class="main-content-wrapper">
+            <!-- Discord Button -->
+            <a href="https://discord.gg/thewatcher" target="_blank" class="discord-button" id="discord-button">
+                <img src="https://cdn.discordapp.com/icons/1305295919888994374/7dcf1206e9de5c95cb3bf0df75db9e8f.webp?size=1024" alt="Discord Server" />
+            </a>
+
+            <div class="container" id="main-content">
+        <div class="page-header">
+            <div class="page-navigation">
+                <button class="nav-btn active" data-page="trades">Trades</button>
+                <button class="nav-btn" data-page="eggs">Eggs</button>
+            </div>
+        </div>
+        
+        <div class="notification-button" id="notification-button">
+            <span class="notification-icon">📊</span>
+            <span class="notification-count" id="notification-count">0</span>
+        </div>
+        
+        <div class="notification-menu" id="notification-menu">
+            <div class="notification-menu-header">
+                <h3>Value Changes</h3>
+                <button class="mark-all-read-btn" id="mark-all-read-btn">Mark All Read</button>
+            </div>
+            <div class="notification-list" id="notification-list">
+                <div class="no-notifications">No new Value Changes</div>
+            </div>
+        </div>
+        
+        <!-- Trades Page -->
+        <div class="page-content active" id="trades-page">
+        <div class="trade-offers">
+            <div class="offer" id="your-offer">
+                <h2>Your Offer</h2>
+                <div class="slots" id="your-slots"></div>
+                <div class="total">Total Value: <span id="your-total">0</span></div>
+            </div>
+            <div class="offer" id="other-offer">
+                <h2>Other's Offer</h2>
+                <div class="slots" id="other-slots"></div>
+                <div class="total">Total Value: <span id="other-total">0</span></div>
+            </div>
+        </div>
+        <div class="trade-result-container">
+            <div id="your-demand-total" class="demand-display">Demand: -</div>
+            <div id="trade-result-text">Let's start a trade!</div>
+            <div id="other-demand-total" class="demand-display">Demand: -</div>
+        </div>
+        <div id="status-warnings"></div>
+        </div>
+
+        <!-- Eggs Page -->
+        <div class="page-content" id="eggs-page">
+            <div class="eggs-header">
+                <div class="eggs-search">
+                    <input type="text" id="eggs-search-bar" placeholder="Search eggs...">
+                </div>
+                <div class="eggs-filter">
+                    <select id="eggs-filter-select">
+                        <option value="all">All • Newest</option>
+                        <option value="limited">Limited</option>
+                        <option value="permanent">Permanent</option>
+                        <option value="coins">Coins</option>
+                        <option value="robux">Robux</option>
+                        <option value="pearls">Pearls</option>
+                        <option value="leaves">Leaves</option>
+                        <option value="season">Season Pass</option>
+                    </select>
+                </div>
+            </div>
+            <div class="eggs-grid" id="eggs-grid">
+                <!-- Eggs will be populated here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- iPhone-style notification popup -->
+    <div class="notification-popup" id="notification-popup">
+        <div class="notification-popup-content">
+            <div class="notification-popup-header">
+                <img src="" alt="" class="notification-pet-image" id="notification-pet-image">
+                <div class="notification-popup-info">
+                    <div class="notification-pet-name" id="notification-pet-name"></div>
+                    <div class="notification-popup-time" id="notification-popup-time"></div>
+                </div>
+            </div>
+            <div class="notification-popup-body">
+                <div class="notification-value-change" id="notification-value-change"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expanded notification view -->
+    <div class="notification-expanded" id="notification-expanded">
+        <div class="notification-expanded-header">
+            <img src="" alt="" class="notification-expanded-pet-image" id="expanded-pet-image">
+            <div class="notification-expanded-info">
+                <div class="notification-expanded-pet-name" id="expanded-pet-name"></div>
+                <div class="notification-expanded-last-edited" id="expanded-last-edited"></div>
+            </div>
+            <button class="notification-expanded-close" id="expanded-close-btn">&times;</button>
+        </div>
+        <div class="notification-expanded-body">
+            <div class="notification-expanded-stats" id="expanded-stats">
+                <!-- Stats will be populated by JavaScript -->
+            </div>
+            <div class="notification-expanded-chart">
+                <h3>Value History</h3>
+                <canvas id="expanded-value-chart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div id="pet-selection-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Select a Pet</h2>
+                <div class="search-sort-controls">
+                    <input type="text" id="search-bar" placeholder="Search pets..."><select id="sort-select"><option value="default">Default</option><option value="value_desc">Value: High to Low</option><option value="value_asc">Value: Low to High</option></select>
+                </div>
+                <span class="close-button">&times;</span>
+            </div>
+            <div class="filter-controls" id="filter-controls"><button class="filter-btn active" data-filter="All">All</button><button class="filter-btn" data-filter="Normal">Normal</button><button class="filter-btn" data-filter="Shiny">Shiny</button><button class="filter-btn" data-filter="Mythic">Mythic</button><button class="filter-btn" data-filter="Shiny Mythic">Shiny Mythic</button></div>
+            <div class="pet-grid" id="pet-grid"></div>
+            <div class="pagination-controls" id="pagination-controls"><button class="pagination-btn" id="prev-page">Previous</button><span id="page-info">Page 1 of 1</span><button class="pagination-btn" id="next-page">Next</button></div>
+        </div>
+    </div>
+
+    <div id="pet-info-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="pet-info-modal-title">Pet Info</h2>
+                <span class="close-button">&times;</span>
+            </div>
+            <div id="pet-info-modal-body"></div>
+        </div>
+    </div>
+
+    <div id="egg-detail-modal" class="modal egg-detail-modal">
+        <div class="modal-content">
+            <button class="egg-popup-close">&times;</button>
+            <div class="egg-popup-header">
+                <img src="" alt="" class="egg-popup-image" id="egg-popup-image">
+                <div class="egg-popup-info">
+                    <div class="egg-popup-name" id="egg-popup-name"></div>
+                    <div class="egg-popup-meta" id="egg-popup-meta"></div>
+                    <div class="egg-popup-price" id="egg-popup-price"></div>
+                </div>
+            </div>
+            <div class="pets-grid" id="egg-pets-grid"></div>
+        </div>
+    </div>
+        </div>
+        <!-- End Main Content -->
+
+    </div>
+    <!-- End Site Wrapper -->
+
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const petGrid = document.getElementById('pet-grid');
+        const tradeResultEl = document.getElementById('trade-result-text');
+        const tradeResultContainer = document.querySelector('.trade-result-container');
+        const petSelectionModal = document.getElementById('pet-selection-modal');
+        const petInfoModal = document.getElementById('pet-info-modal');
+        const petInfoModalTitle = document.getElementById('pet-info-modal-title');
+        const petInfoModalBody = document.getElementById('pet-info-modal-body');
+        const yourSlotsContainer = document.getElementById('your-slots');
+        const otherSlotsContainer = document.getElementById('other-slots');
+        const yourTotalEl = document.getElementById('your-total');
+        const otherTotalEl = document.getElementById('other-total');
+        const yourDemandEl = document.getElementById('your-demand-total');
+        const otherDemandEl = document.getElementById('other-demand-total');
+        const statusWarningsEl = document.getElementById('status-warnings');
+        const filterControls = document.getElementById('filter-controls');
+        const prevPageBtn = document.getElementById('prev-page');
+        const nextPageBtn = document.getElementById('next-page');
+        const pageInfoEl = document.getElementById('page-info');
+        const searchBar = document.getElementById('search-bar');
+        const sortSelect = document.getElementById('sort-select');
+        
+        // Eggs page elements
+        const eggsGrid = document.getElementById('eggs-grid');
+        const eggsSearchBar = document.getElementById('eggs-search-bar');
+        const eggsFilterSelect = document.getElementById('eggs-filter-select');
+        const eggDetailModal = document.getElementById('egg-detail-modal');
+        const eggPopupImage = document.getElementById('egg-popup-image');
+        const eggPopupName = document.getElementById('egg-popup-name');
+        const eggPopupMeta = document.getElementById('egg-popup-meta');
+        const eggPopupPrice = document.getElementById('egg-popup-price');
+        const eggPetsGrid = document.getElementById('egg-pets-grid');
+        
+        
+        let petsData = [], petInfoData = [], secretApiData = {}, statusData = {}, editedPetsData = [];
+        let eggsData = {};
+        let currentActiveSlot = null;
+        const NUM_SLOTS = 10;
+        const tradeState = { yourOffer: new Array(NUM_SLOTS).fill(null), otherOffer: new Array(NUM_SLOTS).fill(null) };
+        let currentFilter = 'All', currentPage = 1, searchTerm = '', currentSort = 'default';
+        let eggsSearchTerm = '', eggsFilter = 'all';
+        const PETS_PER_PAGE = 12;
+        let currentChart = null;
+        
+        // Notification system variables
+        let notifications = [];
+        let lastCheckedTimestamp = null;
+        let notificationCheckInterval = null;
+        
+
+        // This map converts the API's demand string into a reliable number for calculations
+        const demandMap = { "Low": 1, "Medium": 2, "High": 3, "Very High": 4, "Insane": 5 };
+
+        async function loadAllData() {
+            try {
+                const results = await Promise.allSettled([
+                    fetch('https://values.hixand.xyz/pet-values.json'),
+                    fetch('https://secretpetapi.bubblegumsimulatorinfinity.com/'),
+                    fetch('https://api.bgsi.io/petinfo.json'),
+                    fetch('https://api.bgsi.io/status.json'),
+                    fetch('https://api.bgsi.io/edittedpets.json'),
+                    fetch('https://api.bgsi.io/eggs.json')
+                ]);
+                const [valuesResult, secretApiResult, infoResult, statusResult, historicalResult, eggsResult] = results;
+                const getJson = async (result, fallback) => {
+                    if (result.status === 'rejected' || !result.value.ok) {
+                        console.error('An API call failed:', result.reason || `HTTP status ${result.value.status}`);
+                        return fallback;
+                    }
+                    return result.value.json();
+                };
+                petsData = await getJson(valuesResult, []);
+                secretApiData = await getJson(secretApiResult, {});
+                petInfoData = await getJson(infoResult, []);
+                statusData = await getJson(statusResult, {});
+                editedPetsData = await getJson(historicalResult, []);
+                eggsData = await getJson(eggsResult, {});
+                if (petsData.length === 0) { throw new Error("Critical API (pet-values.json) failed to load."); }
+                
+                petsData = petsData.filter(pet => pet.title === "Secret").flatMap(pet => pet.variants.map(variant => {
+                    const demandString = variant.demand || "Low";
+                    return {
+                        id: `${pet.pet_name}_${variant.name}`, petName: pet.pet_name, variant: variant.name,
+                        image: variant.image, value: variant.value === "N/A" ? 0 : parseFloat(variant.value),
+                        demand: demandString,
+                        demandLevel: demandMap[demandString] || 0
+                    };
+                }));
+                console.log('All data loaded successfully');
+                console.log('Pets data:', petsData.length, 'items');
+                console.log('Secret API data:', Object.keys(secretApiData).length, 'items');
+                console.log('Edited pets data:', editedPetsData.length, 'items');
+                console.log('Eggs data:', Object.keys(eggsData).length, 'items');
+                renderUI();
+                renderEggsUI();
+            } catch (error) {
+                console.error("Error during data initialization:", error);
+                petGrid.innerHTML = `<p style="color: #ff3b30;">${error.message}</p>`;
+            }
+        }
+
+        function initializeMainApp() {
+            console.log('Initializing main app...');
+            try {
+            initializeNotificationSystem();
+            initializeSlots();
+            loadAllData();
+            setupNotificationEventListeners();
+                setupPageNavigation();
+                setupEggsEventListeners();
+                console.log('Main app initialized successfully');
+            } catch (error) {
+                console.error('Error initializing main app:', error);
+            }
+        }
+
+        // Page Navigation Functions
+        function setupPageNavigation() {
+            const navButtons = document.querySelectorAll('.nav-btn');
+            const pages = document.querySelectorAll('.page-content');
+            
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetPage = button.dataset.page;
+                    
+                    // Update active button
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    // Show target page
+                    pages.forEach(page => page.classList.remove('active'));
+                    document.getElementById(`${targetPage}-page`).classList.add('active');
+                });
+            });
+        }
+
+        // Eggs Functions
+        function renderEggsUI() {
+            if (!eggsData || Object.keys(eggsData).length === 0) {
+                eggsGrid.innerHTML = '<p style="color: #ff3b30; text-align: center; padding: 40px;">Failed to load eggs data.</p>';
+                return;
+            }
+            
+            let filteredEggs = Object.entries(eggsData);
+            
+            // Apply search filter
+            if (eggsSearchTerm) {
+                filteredEggs = filteredEggs.filter(([name, data]) => 
+                    name.toLowerCase().includes(eggsSearchTerm.toLowerCase())
+                );
+            }
+            
+            // Apply category filter
+            if (eggsFilter !== 'all') {
+                filteredEggs = filteredEggs.filter(([name, data]) => {
+                    switch (eggsFilter) {
+                        case 'limited':
+                            return data.Limited === 'True';
+                        case 'permanent':
+                            return data.Limited === 'False';
+                        case 'coins':
+                            return data.Currency === 'Coins';
+                        case 'robux':
+                            return data.Currency === 'Robux';
+                        case 'pearls':
+                            return data.Currency === 'Pearls';
+                        case 'leaves':
+                            return data.Currency === 'Leaves';
+                        case 'season':
+                            return data.Obtained === 'Season Pass';
+                        default:
+                            return true;
+                    }
+                });
+            }
+            
+            // Sort by release date (newest first)
+            filteredEggs.sort((a, b) => new Date(b[1].Release) - new Date(a[1].Release));
+            
+            eggsGrid.innerHTML = '';
+            
+            if (filteredEggs.length === 0) {
+                eggsGrid.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 40px;">No eggs found matching your criteria.</p>';
+                return;
+            }
+            
+            filteredEggs.forEach(([eggName, eggData]) => {
+                const eggCard = createEggCard(eggName, eggData);
+                eggsGrid.appendChild(eggCard);
+            });
+        }
+        
+        function createEggCard(eggName, eggData) {
+            const card = document.createElement('div');
+            card.className = 'egg-card';
+            card.dataset.eggName = eggName;
+            
+            const statusClass = eggData.Limited === 'True' ? 'limited' : 'permanent';
+            const statusText = eggData.Limited === 'True' ? 'Limited' : 'Permanent';
+            
+            const priceDisplay = getPriceDisplay(eggData);
+            const currencyIcon = getCurrencyIcon(eggData.Currency);
+            
+            card.innerHTML = `
+                <img src="${eggData.Decal}" alt="${eggName}" class="egg-image" loading="lazy">
+                <div class="egg-name">
+                    ${eggName}
+                    <span class="egg-status ${statusClass}">${statusText}</span>
+                </div>
+                <div class="egg-price">
+                    ${currencyIcon}
+                    ${priceDisplay}
+                </div>
+            `;
+            
+            card.addEventListener('click', () => showEggDetailModal(eggName, eggData));
+            return card;
+        }
+        
+        function getPriceDisplay(eggData) {
+            if (eggData.Price === 'N/A' || eggData.Price === '') {
+                return '-';
+            }
+            return typeof eggData.Price === 'number' ? 
+                eggData.Price.toLocaleString() : 
+                eggData.Price;
+        }
+        
+        function getCurrencyIcon(currency) {
+            if (!currency || currency === 'N/A') {
+                return '';
+            }
+            
+            const iconClass = currency.toLowerCase();
+            return `<span class="currency-icon ${iconClass}"></span>`;
+        }
+        
+        function showEggDetailModal(eggName, eggData) {
+            eggPopupImage.src = eggData.Decal;
+            eggPopupImage.alt = eggName;
+            eggPopupName.textContent = eggName;
+            
+            // Meta information
+            const metaItems = [];
+            if (eggData.Island && eggData.Island !== 'N/A') {
+                metaItems.push(`<div class="egg-meta-item">Island: ${eggData.Island}</div>`);
+            }
+            if (eggData.Release && eggData.Release !== 'N/A') {
+                metaItems.push(`<div class="egg-meta-item">Release: ${eggData.Release}</div>`);
+            }
+            if (eggData.Obtained && eggData.Obtained !== 'N/A') {
+                metaItems.push(`<div class="egg-meta-item">Obtained: ${eggData.Obtained}</div>`);
+            }
+            
+            eggPopupMeta.innerHTML = metaItems.join('');
+            
+            // Price information
+            const priceDisplay = getPriceDisplay(eggData);
+            const currencyIcon = getCurrencyIcon(eggData.Currency);
+            eggPopupPrice.innerHTML = `${currencyIcon} ${priceDisplay}`;
+            
+            // Pets section
+            eggPetsGrid.innerHTML = '';
+            if (eggData.Pets && Object.keys(eggData.Pets).length > 0) {
+                Object.entries(eggData.Pets).forEach(([petName, petData]) => {
+                    const petCard = createPetCard(petName, petData);
+                    eggPetsGrid.appendChild(petCard);
+                });
+            } else {
+                eggPetsGrid.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 40px;">No pets data available</p>';
+            }
+            
+            openModal(eggDetailModal);
+        }
+        
+function createPetCard(petName, petData) {
+    const card = document.createElement('div');
+    card.className = 'pet-card';
+
+    const rarityClass = petData.rarity ? petData.rarity.toLowerCase().replace(' ', '-') : 'common';
+
+    // If Secret or Infinity, add special highlight class
+    if (petData.rarity && (petData.rarity.toLowerCase() === "secret" || petData.rarity.toLowerCase() === "infinity")) {
+        card.classList.add("secret-highlight");
+    }
+
+    card.innerHTML = `
+        <div class="pet-card-content">
+            <img src="${petData.image}" alt="${petName}" class="pet-image" loading="lazy">
+            <div class="pet-name">${petName}</div>
+            <div class="pet-chance">Chance: ${petData.chance}</div>
+            <span class="pet-rarity rarity-${rarityClass}">${petData.rarity || 'Unknown'}</span>
+        </div>
+    `;
+
+     // Add click handler (with Secret logic)
+     card.addEventListener('click', () => {
+         if (petData.rarity && (petData.rarity.toLowerCase() === "secret" || petData.rarity.toLowerCase() === "infinity")) {
+             closeModal(eggDetailModal);
+             showSecretPetExpandedNotification(petName, petData);
+         } else {
+             showPetValueChanges(petName, petData);
+         }
+     });
+
+    return card;
+}
+
+        function showSecretPetExpandedNotification(petName, petData) {
+            // Find the matching pet in our pets data to get value information
+            const matchingPet = petsData.find(pet =>
+                pet.petName.toLowerCase() === petName.toLowerCase() ||
+                pet.petName.toLowerCase().includes(petName.toLowerCase()) ||
+                petName.toLowerCase().includes(pet.petName.toLowerCase())
+            );
+            
+            // Get exist count from secret pet API
+            const secretPetData = secretApiData[petName];
+            const existCount = secretPetData ? secretPetData.totalHatched : 'Unknown';
+
+            // Create a mock notification object for the expanded notification
+            const mockNotification = {
+                id: `secret_${petName}_${Date.now()}`,
+                petName: petName,
+                image: petData.image,
+                timestamp: new Date().toISOString(),
+                // Custom values for secret pets
+                newValue: matchingPet ? matchingPet.value : 0,
+                chance: petData.chance,
+                existCount: existCount
+            };
+
+            // Use the existing expanded notification system
+            showSecretPetExpandedView(mockNotification, petData, matchingPet);
+        }
+
+        function getPetImage(petName) {
+            // Try to find pet image from petsData
+            if (petsData && petsData.length > 0) {
+                const pet = petsData.find(p => p.petName === petName);
+                if (pet && pet.image) {
+                    return pet.image;
+                }
+            }
+            
+            // Try to find from secret API data
+            if (secretApiData && secretApiData[petName]) {
+                return secretApiData[petName].imageUrl;
+            }
+            
+            // Default fallback
+            return 'https://images.bgsi.io/pet_placeholder.webp';
+        }
+
+        function showSecretPetExpandedView(notification, petData, matchingPet) {
+            const expandedView = document.getElementById('notification-expanded');
+            const petImage = document.getElementById('expanded-pet-image');
+            const petName = document.getElementById('expanded-pet-name');
+            const lastEdited = document.getElementById('expanded-last-edited');
+            const statsContainer = document.getElementById('expanded-stats');
+            
+            // Set basic info
+            petImage.src = notification.image;
+            petImage.alt = notification.petName;
+            petName.textContent = notification.petName;
+            lastEdited.textContent = `Last edited: ${new Date(notification.timestamp).toLocaleString()}`;
+            
+            // Create custom stats cards for secret pets
+            statsContainer.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-card-title">Current Value</div>
+                    <div class="stat-card-value">${notification.newValue.toLocaleString()}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-title">Chance</div>
+                    <div class="stat-card-value">${petData.chance}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-title">Exist Count</div>
+                    <div class="stat-card-value">${notification.existCount || 'Unknown'}</div>
+                </div>
+            `;
+            
+            // Try to get historical data and create chart
+            try {
+                const historicalData = getPetHistoricalData(notification.petName, 'Normal');
+                if (historicalData.length > 0) {
+                    createExpandedValueChart(historicalData);
+                } else {
+                    const chartElement = document.getElementById('expanded-value-chart');
+                    if (chartElement && chartElement.parentElement) {
+                        chartElement.parentElement.innerHTML = 
+                            '<h3>Value History</h3><div style="display: flex; justify-content: center; align-items: center; height: 200px; color: var(--text-secondary);">No historical data available</div>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading historical data:', error);
+                const chartElement = document.getElementById('expanded-value-chart');
+                if (chartElement && chartElement.parentElement) {
+                    chartElement.parentElement.innerHTML = 
+                        '<h3>Value History</h3><div style="display: flex; justify-content: center; align-items: center; height: 200px; color: var(--text-secondary);">Error loading historical data</div>';
+                }
+            }
+            
+            // Show expanded view
+            expandedView.classList.add('show');
+        }
+
+        
+        function showPetValueChanges(petName, petData) {
+            // Close the egg modal first
+            closeModal(eggDetailModal);
+            
+            // Find the pet in our pets data and show its info modal
+            const matchingPet = petsData.find(pet => 
+                pet.petName === petName || 
+                pet.petName.includes(petName.replace(/\s+/g, '')) ||
+                petName.includes(pet.petName.replace(/\s+/g, ''))
+            );
+            
+            if (matchingPet) {
+                // Show the pet info modal with value changes
+                showPetInfoModal(matchingPet.petName, matchingPet.variant);
+            } else {
+                // If no exact match, try to show a generic pet info
+                console.log('Pet not found in pets data:', petName);
+                // You could show a notification here or handle it differently
+            }
+        }
+        
+        function setupEggsEventListeners() {
+            eggsSearchBar.addEventListener('input', (e) => {
+                eggsSearchTerm = e.target.value.toLowerCase();
+                renderEggsUI();
+            });
+            
+            eggsFilterSelect.addEventListener('change', (e) => {
+                eggsFilter = e.target.value;
+                renderEggsUI();
+            });
+        }
+
+        // Notification system functions
+        function initializeNotificationSystem() {
+            lastCheckedTimestamp = new Date().toISOString();
+            // Check every 10 seconds for more responsive updates
+            notificationCheckInterval = setInterval(checkForNewNotifications, 10000);
+            const savedNotifications = localStorage.getItem('pet-notifications');
+            if (savedNotifications) {
+                try {
+                notifications = JSON.parse(savedNotifications);
+                updateNotificationUI();
+                } catch (error) {
+                    console.error('Error parsing saved notifications:', error);
+                    notifications = [];
+            }
+            }
+            // Also check immediately on load, but only if data is loaded
+            setTimeout(() => {
+                if (petsData && petsData.length > 0) {
+            checkForNewNotifications();
+                }
+            }, 2000);
+        }
+
+        async function checkForNewNotifications() {
+            try {
+                const response = await fetch('https://api.bgsi.io/edittedpets.json');
+                if (!response.ok) {
+                    console.warn('Failed to fetch notification data:', response.status);
+                    return;
+                }
+                
+                const newData = await response.json();
+                const newNotifications = [];
+                
+                console.log(`Checking ${newData.length} changes for notifications...`);
+                
+                newData.forEach(change => {
+                    try {
+                    const changeTime = new Date(change.timestamp);
+                        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+                        
+                        if (changeTime > fiveMinutesAgo) {
+                            // Check if we've already processed this notification
+                            const existingNotification = notifications.find(n => 
+                                n.petName === change.fields[0].value && 
+                                Math.abs(new Date(n.timestamp) - changeTime) < 60000 // Within 1 minute
+                            );
+                            
+                            if (!existingNotification && change.fields && change.fields.length >= 3) {
+                                const petName = change.fields[0].value;
+                                const oldValue = change.fields[1].value;
+                                const newValue = change.fields[2].value;
+                                
+                                // Skip if values are N/A or O/C
+                                if (oldValue === 'N/A' || newValue === 'N/A' || oldValue === 'O/C' || newValue === 'O/C') {
+                                    return;
+                                }
+                                
+                                const oldValueNum = parseFloat(oldValue);
+                                const newValueNum = parseFloat(newValue);
+                                
+                                // Only show significant changes (more than 1% change)
+                                const changePercent = Math.abs((newValueNum - oldValueNum) / oldValueNum) * 100;
+                                if (changePercent < 1) {
+                                    return;
+                                }
+                                
+                                newNotifications.push({
+                                    id: change.timestamp + Math.random(),
+                                    petName: petName,
+                                    oldValue: oldValueNum,
+                                    newValue: newValueNum,
+                                            oldDemand: null,
+                                            newDemand: null,
+                                            oldStatus: null,
+                                            newStatus: null,
+                                            timestamp: change.timestamp,
+                                    changePercent: changePercent,
+                                    isIncrease: newValueNum > oldValueNum,
+                                    image: getPetImage(petName),
+                                            read: false
+                                        });
+                                    }
+                                }
+                    } catch (error) {
+                        console.error('Error processing notification change:', error, change);
+                    }
+                });
+                
+                if (newNotifications.length > 0) {
+                    console.log(`Found ${newNotifications.length} new notifications:`, newNotifications);
+                    notifications.unshift(...newNotifications);
+                    updateNotificationUI();
+                    showNotificationPopup(newNotifications[0]);
+                    saveNotifications();
+                } else {
+                    console.log('No new notifications found');
+                }
+                
+                // Update timestamp for next check
+                lastCheckedTimestamp = new Date().toISOString();
+                
+            } catch (error) {
+                console.error('Error checking for notifications:', error);
+            }
+        }
+
+        function showNotificationPopup(notification) {
+            const popup = document.getElementById('notification-popup');
+            const petImage = document.getElementById('notification-pet-image');
+            const petName = document.getElementById('notification-pet-name');
+            const popupTime = document.getElementById('notification-popup-time');
+            const valueChange = document.getElementById('notification-value-change');
+            
+            // Check if all required elements exist
+            if (!popup || !petImage || !petName || !popupTime || !valueChange) {
+                console.error('Missing notification popup elements:', {
+                    popup: !!popup,
+                    petImage: !!petImage,
+                    petName: !!petName,
+                    popupTime: !!popupTime,
+                    valueChange: !!valueChange
+                });
+                return;
+            }
+            
+            petImage.src = notification.image;
+            petImage.alt = notification.petName;
+            petName.textContent = notification.petName;
+            popupTime.textContent = new Date(notification.timestamp).toLocaleTimeString();
+            
+            let changeText;
+            let changeClass = 'neutral';
+            if (notification.oldValue && notification.oldValue > 0) {
+                const change = notification.newValue - notification.oldValue;
+                changeText = `${notification.oldValue.toLocaleString()} → ${notification.newValue.toLocaleString()}`;
+                if (change > 0) {
+                    changeClass = 'positive';
+                } else if (change < 0) {
+                    changeClass = 'negative';
+                } else {
+                    changeClass = 'neutral';
+                }
+            } else {
+                changeText = `New value: ${notification.newValue.toLocaleString()}`;
+                changeClass = 'neutral';
+            }
+            valueChange.textContent = changeText;
+            valueChange.className = `notification-value-change ${changeClass}`;
+            
+            popup.classList.add('show');
+            
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 5000);
+        }
+
+        function updateNotificationUI() {
+            const notificationCount = document.getElementById('notification-count');
+            const notificationList = document.getElementById('notification-list');
+            const unreadCount = notifications.filter(n => !n.read).length;
+            
+            if (unreadCount > 0) {
+                notificationCount.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                notificationCount.classList.add('show');
+            } else {
+                notificationCount.classList.remove('show');
+            }
+            
+            if (notifications.length === 0) {
+                notificationList.innerHTML = '<div class="no-notifications">No Value Changes</div>';
+            } else {
+                notificationList.innerHTML = notifications.map(notification => `
+                    <div class="notification-item ${notification.read ? '' : 'unread'}" data-id="${notification.id}">
+                        <img src="${notification.image}" alt="${notification.petName}" class="notification-item-image">
+                        <div class="notification-item-content">
+                            <div class="notification-item-pet">${notification.petName}</div>
+                            <div class="notification-item-change">
+                                <div class="notification-value-change ${(() => {
+                                    if (notification.oldValue && notification.oldValue > 0) {
+                                        const change = notification.newValue - notification.oldValue;
+                                        if (change > 0) return 'positive';
+                                        if (change < 0) return 'negative';
+                                        return 'neutral';
+                                    }
+                                    return 'neutral';
+                                })()}">
+                                    ${notification.oldValue && notification.oldValue > 0 ? 
+                                        (() => {
+                                            const change = notification.newValue - notification.oldValue;
+                                            const changeAmount = Math.abs(change);
+                                            if (change > 0) {
+                                                return `+${changeAmount.toLocaleString()}`;
+                                            } else if (change < 0) {
+                                                return `-${changeAmount.toLocaleString()}`;
+                                            } else {
+                                                return 'No change';
+                                            }
+                                        })() :
+                                        `New value: ${notification.newValue.toLocaleString()}`
+                                    }
+                                </div>
+                                <div class="notification-item-details">
+                                    ${notification.oldDemand && notification.newDemand && notification.oldDemand !== notification.newDemand ? 
+                                        `<div class="notification-demand-change">Demand: ${notification.oldDemand} → ${notification.newDemand}</div>` : ''
+                                    }
+                                    ${notification.oldStatus && notification.newStatus && notification.oldStatus !== notification.newStatus ? 
+                                        `<div class="notification-status-change">Status: ${notification.oldStatus} → ${notification.newStatus}</div>` : ''
+                                    }
+                                </div>
+                            </div>
+                            <div class="notification-item-time">${new Date(notification.timestamp).toLocaleString()}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function markNotificationAsRead(notificationId) {
+            const notification = notifications.find(n => n.id === notificationId);
+            if (notification) {
+                notification.read = true;
+                updateNotificationUI();
+                saveNotifications();
+            }
+        }
+
+        function markAllNotificationsAsRead() {
+            notifications.forEach(notification => {
+                notification.read = true;
+            });
+            updateNotificationUI();
+            saveNotifications();
+        }
+
+        function saveNotifications() {
+            notifications = notifications.slice(0, 50);
+            localStorage.setItem('pet-notifications', JSON.stringify(notifications));
+        }
+
+        function toggleNotificationMenu() {
+            const menu = document.getElementById('notification-menu');
+            menu.classList.toggle('show');
+        }
+
+        function showExpandedNotification(notification) {
+            const expandedView = document.getElementById('notification-expanded');
+            const petImage = document.getElementById('expanded-pet-image');
+            const petName = document.getElementById('expanded-pet-name');
+            const lastEdited = document.getElementById('expanded-last-edited');
+            const statsContainer = document.getElementById('expanded-stats');
+            
+            // Set basic info
+            petImage.src = notification.image;
+            petImage.alt = notification.petName;
+            petName.textContent = notification.petName;
+            lastEdited.textContent = `Last edited: ${new Date(notification.timestamp).toLocaleString()}`;
+            
+            // Find the pet data - try to match by pet name more flexibly
+            let petData = petsData.find(p => p.petName === notification.petName);
+            
+            // If not found, try to find by partial match or variant
+            if (!petData) {
+                const petName = notification.petName;
+                // Try to extract base pet name from variant names
+                const baseName = petName.replace(/^(Shiny|Mythic|Shiny Mythic)\s*/, '').replace(/^(Normal)\s*/, '');
+                petData = petsData.find(p => p.petName === baseName || p.petName === petName);
+            }
+            
+            if (!petData) {
+                console.warn('Could not find pet data for notification:', notification.petName);
+                return;
+            }
+            
+            // Determine the correct variant from the notification pet name first
+            let displayVariant = 'Normal';
+            const notificationPetName = notification.petName;
+            if (notificationPetName.includes('Shiny Mythic')) {
+                displayVariant = 'Shiny Mythic';
+            } else if (notificationPetName.includes('Mythic')) {
+                displayVariant = 'Mythic';
+            } else if (notificationPetName.includes('Shiny')) {
+                displayVariant = 'Shiny';
+            }
+            
+            // Create stats cards
+            let valueChange = 0;
+            let valueChangeText = 'No change';
+            let valueChangeClass = 'neutral';
+            
+            if (notification.oldValue && notification.oldValue > 0) {
+                valueChange = notification.newValue - notification.oldValue;
+                const changeAmount = Math.abs(valueChange);
+                if (valueChange > 0) {
+                    valueChangeText = `+${changeAmount.toLocaleString()}`;
+                    valueChangeClass = 'positive';
+                } else if (valueChange < 0) {
+                    valueChangeText = `-${changeAmount.toLocaleString()}`;
+                    valueChangeClass = 'negative';
+                } else {
+                    valueChangeText = 'No change';
+                    valueChangeClass = 'neutral';
+                }
+            } else {
+                // If no old value, try to calculate from historical data
+                const historicalData = getPetHistoricalData(notificationPetName, displayVariant);
+                if (historicalData.length > 1) {
+                    const previousValue = historicalData[historicalData.length - 2].newValue;
+                    if (previousValue && previousValue > 0) {
+                        valueChange = notification.newValue - previousValue;
+                        const changeAmount = Math.abs(valueChange);
+                        if (valueChange > 0) {
+                            valueChangeText = `+${changeAmount.toLocaleString()}`;
+                            valueChangeClass = 'positive';
+                        } else if (valueChange < 0) {
+                            valueChangeText = `-${changeAmount.toLocaleString()}`;
+                            valueChangeClass = 'negative';
+                        } else {
+                            valueChangeText = 'No change';
+                            valueChangeClass = 'neutral';
+                        }
+                    } else {
+                        valueChangeText = 'New value';
+                        valueChangeClass = 'neutral';
+                    }
+                } else {
+                    valueChangeText = 'New value';
+                    valueChangeClass = 'neutral';
+                }
+            }
+            
+            statsContainer.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-card-title">Current Value</div>
+                    <div class="stat-card-value">${notification.newValue.toLocaleString()}</div>
+                    <div class="stat-card-change ${valueChangeClass}">${valueChangeText}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-title">Demand</div>
+                    <div class="stat-card-value">${petData.demand}</div>
+                    ${notification.oldDemand && notification.newDemand && notification.oldDemand !== notification.newDemand ? 
+                        `<div class="stat-card-change">${notification.oldDemand} → ${notification.newDemand}</div>` : ''
+                    }
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-title">Rarity</div>
+                    <div class="stat-card-value">${displayVariant}</div>
+                </div>
+            `;
+            
+            // Create chart using the determined variant
+            const historicalData = getPetHistoricalData(notificationPetName, displayVariant);
+            if (historicalData.length > 0) {
+                createExpandedValueChart(historicalData);
+            } else {
+                const chartElement = document.getElementById('expanded-value-chart');
+                if (chartElement && chartElement.parentElement) {
+                    chartElement.parentElement.innerHTML = 
+                    '<h3>Value History</h3><div style="display: flex; justify-content: center; align-items: center; height: 200px; color: var(--text-secondary);">No historical data available</div>';
+                }
+            }
+            
+            // Show expanded view
+            expandedView.classList.add('show');
+        }
+
+        function createExpandedValueChart(historicalData) {
+            const ctx = document.getElementById('expanded-value-chart').getContext('2d');
+            
+            if (currentChart) {
+                currentChart.destroy();
+            }
+            
+            const labels = historicalData.map(data => data.timestamp.toLocaleDateString());
+            const values = historicalData.map(data => data.newValue);
+            
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(74, 144, 226, 0.3)');
+            gradient.addColorStop(1, 'rgba(74, 144, 226, 0.05)');
+
+            currentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Value',
+                        data: values,
+                        borderColor: '#4a90e2',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#4a90e2',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(30, 30, 30, 0.9)',
+                            titleColor: '#e0e0e0',
+                            bodyColor: '#e0e0e0',
+                            borderColor: '#4a90e2',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    return `Value: ${context.parsed.y.toLocaleString()}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#b0b0b0',
+                                maxTicksLimit: 8
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#b0b0b0',
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        }
+
+        function closeExpandedNotification() {
+            const expandedView = document.getElementById('notification-expanded');
+            expandedView.classList.remove('show');
+            if (currentChart) {
+                currentChart.destroy();
+                currentChart = null;
+            }
+        }
+
+        function setupNotificationEventListeners() {
+            // Notification button click
+            const notificationButton = document.getElementById('notification-button');
+            if (notificationButton) {
+                notificationButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleNotificationMenu();
+                });
+            }
+
+            // Mark all read button
+            const markAllReadBtn = document.getElementById('mark-all-read-btn');
+            if (markAllReadBtn) {
+                markAllReadBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    markAllNotificationsAsRead();
+                });
+            }
+
+            // Notification list clicks
+            const notificationList = document.getElementById('notification-list');
+            if (notificationList) {
+                notificationList.addEventListener('click', (e) => {
+                    const notificationItem = e.target.closest('.notification-item');
+                    if (notificationItem) {
+                        const notificationId = notificationItem.dataset.id;
+                        const notification = notifications.find(n => n.id === notificationId);
+                        if (notification) {
+                            markNotificationAsRead(notificationId);
+                            showExpandedNotification(notification);
+                        }
+                    }
+                });
+            }
+
+            // Close expanded notification
+            const expandedCloseBtn = document.getElementById('expanded-close-btn');
+            if (expandedCloseBtn) {
+                expandedCloseBtn.addEventListener('click', closeExpandedNotification);
+            }
+
+            // Close expanded notification when clicking outside
+            const expandedView = document.getElementById('notification-expanded');
+            if (expandedView) {
+                expandedView.addEventListener('click', (e) => {
+                    if (e.target === expandedView) {
+                        closeExpandedNotification();
+                    }
+                });
+            }
+
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                const notificationButton = document.getElementById('notification-button');
+                const notificationMenu = document.getElementById('notification-menu');
+                
+                if (notificationButton && notificationMenu && 
+                    !notificationButton.contains(e.target) && 
+                    !notificationMenu.contains(e.target)) {
+                    notificationMenu.classList.remove('show');
+                }
+            });
+        }
+
+        function renderUI() {
+            let processedPets = [...petsData];
+            if (searchTerm) { processedPets = processedPets.filter(pet => pet.petName.toLowerCase().includes(searchTerm)); }
+            const specialVariants = ['Shiny', 'Mythic', 'Shiny Mythic'];
+            if (currentFilter !== 'All') {
+                processedPets = processedPets.filter(pet => {
+                    if (currentFilter === 'Normal') return !specialVariants.includes(pet.variant);
+                    return pet.variant === currentFilter;
+                });
+            }
+            if (currentSort === 'value_desc') { processedPets.sort((a, b) => b.value - a.value); } 
+            else if (currentSort === 'value_asc') { processedPets.sort((a, b) => a.value - b.value); }
+            
+            const startIndex = (currentPage - 1) * PETS_PER_PAGE;
+            const endIndex = startIndex + PETS_PER_PAGE;
+            const paginatedPets = processedPets.slice(startIndex, endIndex);
+            petGrid.innerHTML = '';
+
+            if (paginatedPets.length === 0) {
+                petGrid.innerHTML = '<p>No pets found.</p>';
+            } else {
+                paginatedPets.forEach(pet => {
+                    const petElement = document.createElement('div');
+                    petElement.className = 'pet-item';
+                    petElement.dataset.petId = pet.id;
+                    petElement.innerHTML = `
+                        <button class="more-info-btn" data-pet-name="${pet.petName}" data-variant-name="${pet.variant}">...</button>
+                        <img src="${pet.image}" alt="${pet.petName}" loading="lazy">
+                        <div>
+                            <div class="pet-info-name">${pet.petName} (${pet.variant})</div>
+                            <div class="pet-info">Value: ${pet.value.toLocaleString()}</div>
+                            <div class="pet-info">Demand: ${pet.demand}</div>
+                        </div>
+                    `;
+                    petGrid.appendChild(petElement);
+                });
+            }
+            const totalPages = Math.ceil(processedPets.length / PETS_PER_PAGE);
+            pageInfoEl.textContent = `Page ${currentPage} of ${totalPages > 0 ? totalPages : 1}`;
+            prevPageBtn.disabled = currentPage === 1;
+            nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
+        }
+
+        function initializeSlots() {
+            [yourSlotsContainer, otherSlotsContainer].forEach(container => {
+                container.innerHTML = '';
+                for (let i = 0; i < NUM_SLOTS; i++) {
+                    const slot = document.createElement('div');
+                    slot.className = 'slot empty';
+                    slot.dataset.index = i;
+                    slot.dataset.offer = container.id === 'your-slots' ? 'yourOffer' : 'otherOffer';
+                    container.appendChild(slot);
+                }
+            });
+        }
+        
+        function renderSingleSlot(offerType, index) {
+            const container = offerType === 'yourOffer' ? yourSlotsContainer : otherSlotsContainer;
+            const slot = container.querySelector(`[data-index='${index}']`);
+            const item = tradeState[offerType][index];
+            if (item && item.pet) {
+                slot.innerHTML = `
+                    <button class="remove-button">&times;</button>
+                    <img src="${item.pet.image}" alt="${item.pet.petName}">
+                    <div class="slot-pet-name">${item.pet.petName} (${item.pet.variant})</div>
+                    <div class="quantity-controls">
+                        <button class="qty-btn minus" data-op="-1">-</button>
+                        <span class="quantity">${item.quantity}</span>
+                        <button class="qty-btn plus" data-op="1">+</button>
+                    </div>
+                `;
+                slot.classList.remove('empty');
+                slot.classList.add('filled');
+            } else {
+                slot.innerHTML = '';
+                slot.classList.add('empty');
+                slot.classList.remove('filled');
+            }
+        }
+        function addPetToSlot(pet) {
+            if (!currentActiveSlot) return;
+            const offerType = currentActiveSlot.dataset.offer;
+            const existingItemIndex = tradeState[offerType].findIndex(item => item?.pet.id === pet.id);
+            if (existingItemIndex > -1) {
+                tradeState[offerType][existingItemIndex].quantity++;
+                renderSingleSlot(offerType, existingItemIndex);
+            } else {
+                const index = parseInt(currentActiveSlot.dataset.index, 10);
+                tradeState[offerType][index] = { pet: pet, quantity: 1 };
+                renderSingleSlot(offerType, index);
+            }
+            updateTotalsAndWarnings();
+            closeModal(petSelectionModal);
+        }
+        function updateQuantity(slot, operation) {
+            const offerType = slot.dataset.offer;
+            const index = parseInt(slot.dataset.index, 10);
+            const item = tradeState[offerType][index];
+            if (!item) return;
+            item.quantity += operation;
+            if (item.quantity <= 0) {
+                tradeState[offerType][index] = null;
+            }
+            renderSingleSlot(offerType, index);
+            updateTotalsAndWarnings();
+        }
+        function removePetFromSlot(slot) {
+            const offerType = slot.dataset.offer;
+            const index = parseInt(slot.dataset.index, 10);
+            tradeState[offerType][index] = null;
+            renderSingleSlot(offerType, index);
+            updateTotalsAndWarnings();
+        }
+
+        function getDemandInfo(offer) {
+            const petsInOffer = offer.filter(Boolean);
+            if (petsInOffer.length === 0) return { label: '-', className: '' };
+            const totalDemandScore = petsInOffer.reduce((sum, item) => sum + (item.pet.demandLevel * item.quantity), 0);
+            const totalQuantity = petsInOffer.reduce((sum, item) => sum + item.quantity, 0);
+            const averageDemand = totalQuantity > 0 ? totalDemandScore / totalQuantity : 0;
+            
+            if (averageDemand >= 4.5) return { label: 'Insane', className: 'demand-insane' };
+            if (averageDemand >= 3.5) return { label: 'Very High', className: 'demand-very-high' };
+            if (averageDemand >= 2.5) return { label: 'High', className: 'demand-high' };
+            if (averageDemand >= 1.5) return { label: 'Medium', className: 'demand-medium' };
+            return { label: 'Low', className: 'demand-low' };
+        }
+
+        function updateTotalsAndWarnings() {
+            const yourTotalValue = tradeState.yourOffer.reduce((sum, item) => sum + (item ? item.pet.value * item.quantity : 0), 0);
+            const otherTotalValue = tradeState.otherOffer.reduce((sum, item) => sum + (item ? item.pet.value * item.quantity : 0), 0);
+            yourTotalEl.textContent = yourTotalValue.toLocaleString();
+            otherTotalEl.textContent = otherTotalValue.toLocaleString();
+
+            const yourDemand = getDemandInfo(tradeState.yourOffer);
+            yourDemandEl.innerHTML = `Demand: <span class="demand-label ${yourDemand.className}">${yourDemand.label}</span>`;
+            
+            const otherDemand = getDemandInfo(tradeState.otherOffer);
+            otherDemandEl.innerHTML = `Demand: <span class="demand-label ${otherDemand.className}">${otherDemand.label}</span>`;
+            
+            updateTradeStatus(yourTotalValue, otherTotalValue);
+            updateStatusWarnings();
+        }
+
+        function updateStatusWarnings() {
+            statusWarningsEl.innerHTML = '';
+            const allPetsInTrade = [...tradeState.yourOffer, ...tradeState.otherOffer].filter(Boolean);
+            const warnedPets = new Set();
+            const specialVariants = ['Shiny', 'Mythic', 'Shiny Mythic'];
+
+            allPetsInTrade.forEach(item => {
+                const pet = item.pet;
+                if (warnedPets.has(pet.id)) return;
+                let lookupKey;
+                const petNameLower = pet.petName.toLowerCase();
+                const variantName = pet.variant;
+
+                if (specialVariants.includes(variantName)) {
+                    lookupKey = `${variantName.toLowerCase()} ${petNameLower}`;
+                } else {
+                    lookupKey = petNameLower;
+                }
+                const status = statusData[lookupKey];
+                if (status && (status.hoarded || status.manipulated)) {
+                    let warningText = status.hoarded ? 'may be hoarded' : 'may be manipulated';
+                    const warningEl = document.createElement('div');
+                    warningEl.className = 'warning-item';
+                    warningEl.textContent = `Warning: ${pet.petName} (${pet.variant}) ${warningText}.`;
+                    statusWarningsEl.appendChild(warningEl);
+                    warnedPets.add(pet.id);
+                }
+            });
+        }
+
+        function updateTradeStatus(yourTotal, otherTotal) {
+            const profit = otherTotal - yourTotal;
+            if (yourTotal === 0 && otherTotal === 0) {
+                tradeResultContainer.classList.remove('active');
+                tradeResultEl.textContent = "Let's start a trade!";
+                tradeResultEl.style.backgroundColor = 'transparent';
+                tradeResultEl.style.color = 'var(--text-primary)';
+            } else {
+                tradeResultContainer.classList.add('active');
+                if (profit > 0) {
+                    tradeResultEl.textContent = `Win by ${profit.toLocaleString()}`;
+                    tradeResultEl.style.backgroundColor = 'var(--win-color)';
+                    tradeResultEl.style.color = '#fff';
+                } else if (profit < 0) {
+                    tradeResultEl.textContent = `Loss by ${(-profit).toLocaleString()}`;
+                    tradeResultEl.style.backgroundColor = 'var(--loss-color)';
+                    tradeResultEl.style.color = '#fff';
+                } else {
+                    tradeResultEl.textContent = 'Fair Trade!';
+                    tradeResultEl.style.backgroundColor = 'transparent';
+                    tradeResultEl.style.color = 'var(--text-primary)';
+                }
+            }
+        }
+        
+        function getPetHistoricalData(petName, variantName) {
+            if (!editedPetsData || editedPetsData.length === 0) {
+                return [];
+            }
+            
+            const petChanges = editedPetsData.filter(change => {
+                if (!change.fields || !Array.isArray(change.fields) || change.fields.length < 3) return false;
+                
+                // New API format: fields[0] = pet name, fields[1] = old value, fields[2] = new value
+                const petNameField = change.fields[0];
+                if (!petNameField || !petNameField.value) return false;
+                
+                const changePetName = petNameField.value;
+                
+                // More flexible matching for all variants
+                if (variantName === 'Normal') {
+                    // For normal variants, match exact name or name without prefixes
+                    return changePetName === petName || 
+                           changePetName === `Normal ${petName}` ||
+                           (!changePetName.includes('Shiny') && !changePetName.includes('Mythic') && changePetName.includes(petName));
+                } else if (variantName === 'Shiny') {
+                    return changePetName === `Shiny ${petName}` || 
+                           changePetName === `Shiny Normal ${petName}` ||
+                           (changePetName.includes('Shiny') && changePetName.includes(petName) && !changePetName.includes('Mythic'));
+                } else if (variantName === 'Mythic') {
+                    return changePetName === `Mythic ${petName}` || 
+                           changePetName === `Mythic Normal ${petName}` ||
+                           (changePetName.includes('Mythic') && changePetName.includes(petName) && !changePetName.includes('Shiny'));
+                } else if (variantName === 'Shiny Mythic') {
+                    return changePetName === `Shiny Mythic ${petName}` || 
+                           changePetName === `Shiny Mythic Normal ${petName}` ||
+                           (changePetName.includes('Shiny') && changePetName.includes('Mythic') && changePetName.includes(petName));
+                }
+                
+                // Fallback: try to match any variant containing the pet name
+                return changePetName.includes(petName);
+            });
+
+            const chartData = petChanges.map(change => {
+                // New API format: fields[1] = old value, fields[2] = new value
+                const oldValueField = change.fields[1];
+                const newValueField = change.fields[2];
+                
+                const oldValue = oldValueField?.value === "N/A" ? null : parseFloat(oldValueField?.value) || null;
+                const newValue = newValueField?.value === "N/A" || newValueField?.value === "O/C" ? null : parseFloat(newValueField?.value) || null;
+                
+                return {
+                    timestamp: new Date(change.timestamp),
+                    oldValue: oldValue,
+                    newValue: newValue,
+                    change: change
+                };
+            }).filter(data => data.newValue !== null).sort((a, b) => a.timestamp - b.timestamp);
+
+            return chartData;
+        }
+
+        function createValueChart(petName, variantName, historicalData) {
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            const ctx = document.getElementById('value-chart').getContext('2d');
+            
+            const labels = historicalData.map(data => data.timestamp.toLocaleDateString());
+            const values = historicalData.map(data => data.newValue);
+            
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(74, 144, 226, 0.3)');
+            gradient.addColorStop(1, 'rgba(74, 144, 226, 0.05)');
+
+            currentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Value',
+                        data: values,
+                        borderColor: '#4a90e2',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#4a90e2',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(30, 30, 30, 0.9)',
+                            titleColor: '#e0e0e0',
+                            bodyColor: '#e0e0e0',
+                            borderColor: '#4a90e2',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    return `Value: ${context.parsed.y.toLocaleString()}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#b0b0b0',
+                                maxTicksLimit: 8
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#b0b0b0',
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        }
+
+        async function showPetInfoModal(petName, variantName) {
+            const petData = petsData.find(p => p.petName === petName && p.variant === variantName);
+            const petInfo = petInfoData.find(p => p.pet_name === petName);
+            if (!petData) return;
+
+            const specialPrefixes = ['Shiny', 'Mythic', 'Shiny Mythic'];
+            let rarityLookupKey = specialPrefixes.includes(variantName) ? `${variantName} ${petName}` : petName;
+            const rarityInfo = secretApiData[rarityLookupKey];
+            
+            const variantInfo = petInfo?.variants?.find(v => v.name === variantName) || petInfo?.variants?.find(v => v.name === 'Normal');
+
+            petInfoModalTitle.textContent = `${petName} (${variantName})`;
+            petInfoModalBody.innerHTML = `
+                <div class="pet-header">
+                    <img src="${petData.image}" alt="${petName}">
+                    <div class="pet-info-summary">
+                        <div class="current-value">Current Value: ${petData.value.toLocaleString()}</div>
+                        <div class="demand-info">Demand: ${petData.demand}</div>
+                        <div class="rarity-info">Rarity: ${rarityInfo?.rarity ?? 'N/A'}</div>
+                        ${variantInfo ? `
+                            <p class="stat-category">Base Stats</p>
+                            <p>Bubbles: ${variantInfo.stats?.base?.bubbles?.toLocaleString() ?? 'N/A'}</p>
+                            <p>Gems: ${variantInfo.stats?.base?.gems?.toLocaleString() ?? 'N/A'}</p>
+                        ` : ''}
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-loading">Loading value history...</div>
+                </div>
+            `;
+            openModal(petInfoModal);
+
+            try {
+                const historicalData = getPetHistoricalData(petName, variantName);
+                
+                if (historicalData.length === 0) {
+                    document.querySelector('.chart-container').innerHTML = `
+                        <div class="chart-error">No historical data available for this pet</div>
+                    `;
+                    return;
+                }
+
+                document.querySelector('.chart-container').innerHTML = `
+                    <canvas id="value-chart"></canvas>
+                `;
+                
+                createValueChart(petName, variantName, historicalData);
+            } catch (error) {
+                console.error('Error loading historical data:', error);
+                document.querySelector('.chart-container').innerHTML = `
+                    <div class="chart-error">Error loading historical data</div>
+                `;
+            }
+        }
+
+        function openModal(modal) { modal.classList.add('show'); }
+        function closeModal(modal) { 
+            modal.classList.remove('show'); 
+            if (modal.id === 'pet-info-modal' && currentChart) {
+                currentChart.destroy();
+                currentChart = null;
+            }
+        }
+
+        // Event listeners
+        document.body.addEventListener('click', (e) => {
+            const slot = e.target.closest('.slot');
+            if (slot && slot.classList.contains('empty')) {
+                currentActiveSlot = slot;
+                openModal(petSelectionModal);
+            }
+            if (e.target.classList.contains('remove-button') && slot) { removePetFromSlot(slot); }
+            if (e.target.classList.contains('qty-btn') && slot) { updateQuantity(slot, parseInt(e.target.dataset.op)); }
+            if (e.target.classList.contains('more-info-btn')) {
+                const button = e.target;
+                showPetInfoModal(button.dataset.petName, button.dataset.variantName);
+            }
+            if (e.target.matches('.close-button') || e.target.matches('.modal') || e.target.matches('.egg-popup-close')) {
+                closeModal(petSelectionModal);
+                closeModal(petInfoModal);
+                closeModal(eggDetailModal);
+            }
+        });
+        
+        petGrid.addEventListener('click', (e) => {
+            if (e.target.classList.contains('more-info-btn')) return;
+            const petItem = e.target.closest('.pet-item');
+            if (petItem) {
+                const petId = petItem.dataset.petId;
+                const selectedPet = petsData.find(p => p.id === petId);
+                if (selectedPet) addPetToSlot(selectedPet);
+            }
+        });
+        
+        searchBar.addEventListener('input', (e) => { searchTerm = e.target.value.toLowerCase(); currentPage = 1; renderUI(); });
+        sortSelect.addEventListener('change', (e) => { currentSort = e.target.value; currentPage = 1; renderUI(); });
+        filterControls.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                document.querySelector('.filter-btn.active').classList.remove('active');
+                e.target.classList.add('active');
+                currentFilter = e.target.dataset.filter;
+                currentPage = 1;
+                renderUI();
+            }
+        });
+        prevPageBtn.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderUI(); } });
+        nextPageBtn.addEventListener('click', () => { currentPage++; renderUI(); });
+        
+        // Initialize the app on page load
+        try {
+        initializeMainApp();
+        } catch (error) {
+            console.error('Failed to initialize app:', error);
+            document.body.innerHTML = `
+                <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; color: #ff3b30;">
+                    <h1>App Failed to Load</h1>
+                    <p>Check the console for error details</p>
+                    <button onclick="location.reload()" style="padding: 10px 20px; background: #4a90e2; color: white; border: none; border-radius: 5px; cursor: pointer;">Reload</button>
+                </div>
+            `;
+        }
+        
+    });
+
+
+    </script>
+
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"b4d4f7c9000a4314a704d7e3ec76080b","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
