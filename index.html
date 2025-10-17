@@ -1489,28 +1489,47 @@
 
         async function loadAllData() {
             try {
+                // Create fetch with timeout to handle QUIC protocol errors
+                const fetchWithTimeout = (url, timeout = 10000) => {
+                    return Promise.race([
+                        fetch(url),
+                        new Promise((_, reject) => 
+                            setTimeout(() => reject(new Error('Request timeout')), timeout)
+                        )
+                    ]);
+                };
+
                 const results = await Promise.allSettled([
-                    fetch('https://values.hixand.xyz/pet-values.json'),
-                    fetch('https://secretpetapi.bubblegumsimulatorinfinity.com/'),
-                    fetch('https://api.bgsi.io/petinfo.json'),
-                    fetch('https://api.bgsi.io/status.json'),
-                    fetch('https://api.bgsi.io/edittedpets.json'),
-                    fetch('https://api.bgsi.io/eggs.json')
+                    fetchWithTimeout('https://values.hixand.xyz/pet-values.json'),
+                    fetchWithTimeout('https://secretpetapi.bubblegumsimulatorinfinity.com/', 5000), // Shorter timeout for problematic API
+                    fetchWithTimeout('https://api.bgsi.io/petinfo.json'),
+                    fetchWithTimeout('https://api.bgsi.io/status.json'),
+                    fetchWithTimeout('https://api.bgsi.io/edittedpets.json'),
+                    fetchWithTimeout('https://api.bgsi.io/eggs.json')
                 ]);
                 const [valuesResult, secretApiResult, infoResult, statusResult, historicalResult, eggsResult] = results;
-                const getJson = async (result, fallback) => {
-                    if (result.status === 'rejected' || !result.value.ok) {
-                        console.error('An API call failed:', result.reason || `HTTP status ${result.value.status}`);
+                const getJson = async (result, fallback, apiName = 'Unknown API') => {
+                    if (result.status === 'rejected') {
+                        console.warn(`${apiName} failed:`, result.reason);
                         return fallback;
                     }
-                    return result.value.json();
+                    if (!result.value.ok) {
+                        console.warn(`${apiName} returned status ${result.value.status}`);
+                        return fallback;
+                    }
+                    try {
+                        return await result.value.json();
+                    } catch (parseError) {
+                        console.warn(`${apiName} JSON parse error:`, parseError);
+                        return fallback;
+                    }
                 };
-                petsData = await getJson(valuesResult, []);
-                secretApiData = await getJson(secretApiResult, {});
-                petInfoData = await getJson(infoResult, []);
-                statusData = await getJson(statusResult, {});
-                editedPetsData = await getJson(historicalResult, []);
-                eggsData = await getJson(eggsResult, {});
+                petsData = await getJson(valuesResult, [], 'Pet Values API');
+                secretApiData = await getJson(secretApiResult, {}, 'Secret Pet API');
+                petInfoData = await getJson(infoResult, [], 'Pet Info API');
+                statusData = await getJson(statusResult, {}, 'Status API');
+                editedPetsData = await getJson(historicalResult, [], 'Edited Pets API');
+                eggsData = await getJson(eggsResult, {}, 'Eggs API');
                 if (petsData.length === 0) { throw new Error("Critical API (pet-values.json) failed to load."); }
                 
                 petsData = petsData.filter(pet => pet.title === "Secret").flatMap(pet => pet.variants.map(variant => {
@@ -2865,6 +2884,5 @@ function createPetCard(petName, petData) {
     </script>
 
 
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"b4d4f7c9000a4314a704d7e3ec76080b","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
