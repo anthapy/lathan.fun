@@ -1529,6 +1529,7 @@
                 petInfoData = await getJson(infoResult, [], 'Pet Info API');
                 statusData = await getJson(statusResult, {}, 'Status API');
                 editedPetsData = await getJson(historicalResult, [], 'Edited Pets API');
+                console.log('Edited Pets API response:', editedPetsData);
                 eggsData = await getJson(eggsResult, {}, 'Eggs API');
                 if (petsData.length === 0) { throw new Error("Critical API (pet-values.json) failed to load."); }
                 
@@ -2617,18 +2618,30 @@ function createPetCard(petName, petData) {
         }
         
         function getPetHistoricalData(petName, variantName) {
+            console.log('Getting historical data for:', petName, variantName);
+            console.log('editedPetsData length:', editedPetsData ? editedPetsData.length : 'undefined');
+            console.log('editedPetsData sample:', editedPetsData ? editedPetsData.slice(0, 2) : 'undefined');
+            
             if (!editedPetsData || editedPetsData.length === 0) {
+                console.log('No edited pets data available');
                 return [];
             }
             
             const petChanges = editedPetsData.filter(change => {
-                if (!change.fields || !Array.isArray(change.fields) || change.fields.length < 3) return false;
+                if (!change.fields || !Array.isArray(change.fields) || change.fields.length < 3) {
+                    console.log('Invalid change structure:', change);
+                    return false;
+                }
                 
                 // New API format: fields[0] = pet name, fields[1] = old value, fields[2] = new value
                 const petNameField = change.fields[0];
-                if (!petNameField || !petNameField.value) return false;
+                if (!petNameField || !petNameField.value) {
+                    console.log('No pet name field:', change);
+                    return false;
+                }
                 
                 const changePetName = petNameField.value;
+                console.log('Checking change for pet:', changePetName, 'against:', petName, variantName);
                 
                 // More flexible matching for all variants
                 if (variantName === 'Normal') {
@@ -2670,6 +2683,8 @@ function createPetCard(petName, petData) {
                 };
             }).filter(data => data.newValue !== null).sort((a, b) => a.timestamp - b.timestamp);
 
+            console.log('Found', chartData.length, 'historical data points for', petName, variantName);
+            console.log('Chart data sample:', chartData.slice(0, 3));
             return chartData;
         }
 
